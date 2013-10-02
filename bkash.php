@@ -42,7 +42,7 @@ class WC_bKash {
     function install() {
         global $wpdb;
         
-        $query = "CREATE TABLE `{$wpdb->prefix}wc_bkash` (
+        $query = "CREATE TABLE IF NOT EXISTS `{$wpdb->prefix}wc_bkash` (
             `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
             `trxId` int(11) DEFAULT NULL,
             `sender` varchar(15) DEFAULT NULL,
