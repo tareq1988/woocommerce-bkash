@@ -37,14 +37,12 @@ class WC_Gateway_bKash extends WC_Payment_Gateway {
             'title' => array(
                 'title' => __( 'Title', 'wc-bkash' ),
                 'type' => 'text',
-                'description' => __( 'This controls the title which the user sees during checkout.', 'wc-bkash' ),
                 'default' => __( 'bKash Payment', 'wc-bkash' ),
-                'desc_tip' => true,
             ),
             'description' => array(
                 'title' => __( 'Customer Message', 'wc-bkash' ),
                 'type' => 'textarea',
-                'default' => ''
+                'default' => 'Enter your payment transaction ID'
             ),
             'username' => array(
                 'title' => __( 'Merchant Username', 'wc-bkash' ),
@@ -68,6 +66,7 @@ class WC_Gateway_bKash extends WC_Payment_Gateway {
             <label>Transaction ID <span class="required">*</span></label>
 
             <input class="input-text" type="text" name="bkash_trxid" />
+            <span class="description"><?php echo $this->get_option('description'); ?></span>
         </p>
         <?php
 
