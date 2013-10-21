@@ -64,7 +64,7 @@ class WC_Gateway_bKash extends WC_Payment_Gateway {
     public function payment_fields() {
         ?>
         <p class="form-row validate-required">
-            <label>Transaction ID <span class="required">*</span></label>
+            <label><?php _e( 'Transaction ID', 'wc-bkash' ) ?> <span class="required">*</span></label>
 
             <input class="input-text" type="text" name="bkash_trxid" />
             <span class="description"><?php echo $this->get_option('description'); ?></span>
@@ -102,9 +102,9 @@ class WC_Gateway_bKash extends WC_Payment_Gateway {
          */
 
         $query = array(
-            'user' => 'MelbwebHosting',
-            'pass' => 'mikewisk3yh0t31',
-            'msisdn' => '01779375624',
+            'user' => $this->get_option( 'username' ),
+            'pass' => $this->get_option( 'pass' ),
+            'msisdn' => $this->get_option( 'mobile' ),
             'trxid' => $transaction_id
         );
 
@@ -124,7 +124,6 @@ class WC_Gateway_bKash extends WC_Payment_Gateway {
 
         $order = new WC_Order( $order_id );
 
-        //$transaction_id = '432881128';
         $transaction_id = sanitize_key( $_POST['bkash_trxid'] );
         $response = $this->do_request( $transaction_id );
 
