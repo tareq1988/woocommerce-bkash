@@ -2,7 +2,7 @@
 
 /**
  * bKash Payment gateway
- * 
+ *
  * @author Tareq Hasan
  */
 class WC_Gateway_bKash extends WC_Payment_Gateway {
@@ -18,7 +18,8 @@ class WC_Gateway_bKash extends WC_Payment_Gateway {
         $this->method_description = __( 'Pay via bKash payment', 'wc-bkash' );
         $this->icon = apply_filters( 'woo_bkash_logo', plugins_url( 'images/bkash-logo.png', __FILE__ ) );
 
-        $this->title = $this->get_option( 'title' );
+        $title = $this->get_option( 'title' );
+        $this->title = empty( $title ) ? __( 'bKash', 'wc-bkash' ) : $title;
 
         $this->init_form_fields();
         $this->init_settings();
@@ -131,7 +132,7 @@ class WC_Gateway_bKash extends WC_Payment_Gateway {
             $woocommerce->add_error( __( 'Something went wrong submitting the request', 'wc-bkash' ) );
             return;
         }
-        
+
         if ( $this->transaction_exists( $response->trxId ) ) {
             $woocommerce->add_error( __('Transaction already been used!', 'wc-bkash' ) );
             return;
@@ -155,7 +156,7 @@ class WC_Gateway_bKash extends WC_Payment_Gateway {
             case '1003':
                 $woocommerce->add_error( __( 'Authorization Error, please contact site admin.', 'wc-bkash' ) );
                 return;
-            
+
             case '1004':
                 $woocommerce->add_error( __( 'Transaction ID not found.', 'wc-bkash' ) );
                 return;
@@ -163,34 +164,43 @@ class WC_Gateway_bKash extends WC_Payment_Gateway {
             case '9999':
                 $woocommerce->add_error( __( 'System error, please contact site admin.', 'wc-bkash' ) );
                 return;
-            
+
             case '0000':
-                if ( (float) $order->get_total() > (float) $response->amount ) {
+                $price = (float) $order->get_total();
+
+                // check for BDT if exists
+                $bdt_price = get_post_meta( $order->id, '_bdt', true );
+                if ( $bdt_price != '' ) {
+                    $price = $bdt_price;
+                }
+
+                if ( $price > (float) $response->amount ) {
                     $woocommerce->add_error( __( 'Transaction amount didn\'t match, are you cheating?', 'wc-bkash' ) );
                     return;
                 }
-        
-                $order->add_order_note( __( 'bKash payment completed!', 'wc-bkash' ) );
+
+                $order->add_order_note( sprintf( __( 'bKash payment completed with TrxID#%s! bKash amount: %s', 'wc-bkash' ), $response->trxId, $response->amount ) );
                 $order->payment_complete();
                 $this->insert_transaction( $response );
-                
+                $order->update_status( 'completed' );
+
                 return array(
                     'result' => 'success',
                     'redirect' => $this->get_return_url( $order )
                 );
-                
+
                 break;
         }
     }
-    
+
     public function validate_fields() {
         global $woocommerce;
-        
+
         if ( empty( $_POST['bkash_trxid'] ) ) {
             $woocommerce->add_error( __( 'Please type the transaction ID.', 'wc-bkash' ) );
             return;
         }
-        
+
         return true;
     }
 
@@ -209,7 +219,7 @@ class WC_Gateway_bKash extends WC_Payment_Gateway {
             '%s'
         ) );
     }
-    
+
     function transaction_exists( $transaction_id ) {
         global $wpdb;
 
