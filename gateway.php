@@ -10,16 +10,19 @@ class WC_Gateway_bKash extends WC_Payment_Gateway {
     const base_url = 'http://www.bkashcluster.com:9080/dreamwave/merchant/trxcheck/sendmsg';
     private $table = 'wc_bkash';
 
+    /**
+     * Initialize the gateway
+     */
     function __construct() {
-        $this->id = 'bKash';
-        $this->icon = false;
-        $this->has_fields = true;
-        $this->method_title = __( 'bKash', 'wc-bkash' );
+        $this->id                 = 'bKash';
+        $this->icon               = false;
+        $this->has_fields         = true;
+        $this->method_title       = __( 'bKash', 'wc-bkash' );
         $this->method_description = __( 'Pay via bKash payment', 'wc-bkash' );
-        $this->icon = apply_filters( 'woo_bkash_logo', plugins_url( 'images/bkash-logo.png', __FILE__ ) );
+        $this->icon               = apply_filters( 'woo_bkash_logo', plugins_url( 'images/bkash-logo.png', __FILE__ ) );
 
-        $title = $this->get_option( 'title' );
-        $this->title = empty( $title ) ? __( 'bKash', 'wc-bkash' ) : $title;
+        $title                    = $this->get_option( 'title' );
+        $this->title              = empty( $title ) ? __( 'bKash', 'wc-bkash' ) : $title;
 
         $this->init_form_fields();
         $this->init_settings();
@@ -27,40 +30,50 @@ class WC_Gateway_bKash extends WC_Payment_Gateway {
         add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array($this, 'process_admin_options') );
     }
 
+    /**
+     * Admin configuration parameters
+     *
+     * @return void
+     */
     public function init_form_fields() {
         $this->form_fields = array(
             'enabled' => array(
-                'title' => __( 'Enable/Disable', 'wc-bkash' ),
-                'type' => 'checkbox',
-                'label' => __( 'Enable bKash', 'wc-bkash' ),
+                'title'   => __( 'Enable/Disable', 'wc-bkash' ),
+                'type'    => 'checkbox',
+                'label'   => __( 'Enable bKash', 'wc-bkash' ),
                 'default' => 'yes'
             ),
             'title' => array(
-                'title' => __( 'Title', 'wc-bkash' ),
-                'type' => 'text',
+                'title'   => __( 'Title', 'wc-bkash' ),
+                'type'    => 'text',
                 'default' => __( 'bKash Payment', 'wc-bkash' ),
             ),
             'description' => array(
-                'title' => __( 'Customer Message', 'wc-bkash' ),
-                'type' => 'textarea',
+                'title'   => __( 'Customer Message', 'wc-bkash' ),
+                'type'    => 'textarea',
                 'default' => 'Enter your payment transaction ID'
             ),
             'username' => array(
                 'title' => __( 'Merchant Username', 'wc-bkash' ),
-                'type' => 'text',
+                'type'  => 'text',
             ),
             'pass' => array(
                 'title' => __( 'Merchant password', 'wc-bkash' ),
-                'type' => 'text',
+                'type'  => 'text',
             ),
             'mobile' => array(
-                'title' => __( 'Merchant mobile no.', 'wc-bkash' ),
-                'type' => 'text',
+                'title'       => __( 'Merchant mobile no.', 'wc-bkash' ),
+                'type'        => 'text',
                 'description' => __( 'Enter your registered merchant mobile number.', 'wc-bkash' ),
             ),
         );
     }
 
+    /**
+     * Show the payment field in checkout
+     *
+     * @return void
+     */
     public function payment_fields() {
         ?>
         <p class="form-row validate-required">
@@ -73,39 +86,23 @@ class WC_Gateway_bKash extends WC_Payment_Gateway {
 
     }
 
+    /**
+     * Do the remote request
+     *
+     * For some reason, WP_HTTP doesn't work here. May be
+     * some implementation related problem in their side.
+     *
+     * @param  string  $transaction_id
+     *
+     * @return object
+     */
     function do_request( $transaction_id ) {
-        /*
-          global $wp_version;
-
-          $params = array(
-          'timeout' => 15,
-          'user-agent' => 'WordPress/' . $wp_version . '; ' . home_url( '/' ),
-          'body' => array(
-          'user' => $this->get_option( 'username' ),
-          'pass' => $this->get_option( 'pass' ),
-          'msisdn' => $this->get_option( 'mobile' ),
-          'trxid' => $transaction_id
-          )
-          );
-
-          $response = wp_remote_get( self::base_url, $params );
-          $update = wp_remote_retrieve_body( $response );
-
-          var_dump($response);
-
-          if ( is_wp_error( $response ) || $response['response']['code'] != 200 ) {
-          return false;
-          }
-
-          $response = json_decode( $update );
-          var_dump($response);
-         */
 
         $query = array(
-            'user' => $this->get_option( 'username' ),
-            'pass' => $this->get_option( 'pass' ),
+            'user'   => $this->get_option( 'username' ),
+            'pass'   => $this->get_option( 'pass' ),
             'msisdn' => $this->get_option( 'mobile' ),
-            'trxid' => $transaction_id
+            'trxid'  => $transaction_id
         );
 
         $url = self::base_url . '?' . http_build_query( $query, '', '&' );
@@ -119,6 +116,13 @@ class WC_Gateway_bKash extends WC_Payment_Gateway {
         return false;
     }
 
+    /**
+     * Process the gateway integration
+     *
+     * @param  int  $order_id
+     *
+     * @return void
+     */
     public function process_payment( $order_id ) {
         global $woocommerce;
 
@@ -178,9 +182,10 @@ class WC_Gateway_bKash extends WC_Payment_Gateway {
                     return;
                 }
 
+                $this->insert_transaction( $response );
+
                 $order->add_order_note( sprintf( __( 'bKash payment completed with TrxID#%s! bKash amount: %s', 'wc-bkash' ), $response->trxId, $response->amount ) );
                 $order->payment_complete();
-                $this->insert_transaction( $response );
                 $order->update_status( 'completed' );
 
                 return array(
@@ -192,6 +197,11 @@ class WC_Gateway_bKash extends WC_Payment_Gateway {
         }
     }
 
+    /**
+     * Validate place order submission
+     *
+     * @return bool
+     */
     public function validate_fields() {
         global $woocommerce;
 
@@ -203,13 +213,20 @@ class WC_Gateway_bKash extends WC_Payment_Gateway {
         return true;
     }
 
+    /**
+     * Insert transaction info in the db table
+     *
+     * @param  object  $response
+     *
+     * @return void
+     */
     function insert_transaction( $response ) {
         global $wpdb;
 
         $wpdb->insert( $wpdb->prefix . $this->table, array(
-            'trxId' => $response->trxId,
+            'trxId'  => $response->trxId,
             'sender' => $response->sender,
-            'ref' => $response->reference,
+            'ref'    => $response->reference,
             'amount' => $response->amount
         ), array(
             '%d',
@@ -219,6 +236,13 @@ class WC_Gateway_bKash extends WC_Payment_Gateway {
         ) );
     }
 
+    /**
+     * Check if a transaction exists
+     *
+     * @param  string  $transaction_id
+     *
+     * @return bool
+     */
     function transaction_exists( $transaction_id ) {
         global $wpdb;
 
