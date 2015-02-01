@@ -72,7 +72,7 @@ class WC_bKash {
             `amount` varchar(10) DEFAULT NULL,
             PRIMARY KEY (`id`),
             KEY `trxId` (`trxId`)
-          ) ENGINE=InnoDBDEFAULT CHARSET=utf8;";
+          ) ENGINE=InnoDB DEFAULT CHARSET=utf8;";
 
         $wpdb->query( $query );
     }
