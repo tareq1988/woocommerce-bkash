@@ -16,6 +16,8 @@ bKash Payment gateway for WooCommerce.
 
 Take payment via bKash and verify via transaction ID
 
+[Fork in Github](https://github.com/tareq1988/woocommerce-bkash)
+
 == Installation ==
 
 
