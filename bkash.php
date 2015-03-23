@@ -34,11 +34,11 @@ class WC_bKash {
      * @return void
      */
     function init() {
-        if ( !class_exists( 'WC_Payment_Gateway' ) ) {
+        if ( ! class_exists( 'WC_Payment_Gateway' ) ) {
             return;
         }
 
-        require_once dirname( __FILE__ ) . '/gateway.php';
+        require_once dirname( __FILE__ ) . '/includes/class-wc-bkash.php';
 
         new WC_Gateway_bKash();
     }

@@ -19,7 +19,7 @@ class WC_Gateway_bKash extends WC_Payment_Gateway {
         $this->has_fields         = true;
         $this->method_title       = __( 'bKash', 'wc-bkash' );
         $this->method_description = __( 'Pay via bKash payment', 'wc-bkash' );
-        $this->icon               = apply_filters( 'woo_bkash_logo', plugins_url( 'images/bkash-logo.png', __FILE__ ) );
+        $this->icon               = apply_filters( 'woo_bkash_logo', plugins_url( 'images/bkash-logo.png', dirname( __FILE__ ) ) );
 
         $title                    = $this->get_option( 'title' );
         $this->title              = empty( $title ) ? __( 'bKash', 'wc-bkash' ) : $title;
