@@ -131,13 +131,13 @@ class WC_Gateway_bKash extends WC_Payment_Gateway {
         $transaction_id = sanitize_key( $_POST['bkash_trxid'] );
         $response = $this->do_request( $transaction_id );
 
-        if ( !$response ) {
-            $woocommerce->add_error( __( 'Something went wrong submitting the request', 'wc-bkash' ) );
+        if ( ! $response ) {
+            wc_add_notice( __( 'Something went wrong submitting the request', 'wc-bkash' ), 'error' );
             return;
         }
 
         if ( $this->transaction_exists( $response->trxId ) ) {
-            $woocommerce->add_error( __('Transaction already been used!', 'wc-bkash' ) );
+            wc_add_notice( __('Transaction already been used!', 'wc-bkash' ), 'error' );
             return;
         }
 
@@ -145,27 +145,35 @@ class WC_Gateway_bKash extends WC_Payment_Gateway {
 
             case '0010':
             case '0011':
-                $woocommerce->add_error( __( 'Transaction is pending, please try again later', 'wc-bkash' ) );
+                wc_add_notice( __( 'Transaction is pending, please try again later', 'wc-bkash' ), 'error' );
                 return;
 
-            case '1002':
-                $woocommerce->add_error( __( 'Invalid transaction ID', 'wc-bkash' ) );
+            case '0100':
+                wc_add_notice( __( 'Transaction ID is valid but transaction has been reversed. ', 'wc-bkash' ), 'error' );
                 return;
 
             case '0111':
-                $woocommerce->add_error( __( 'Transaction is failed.', 'wc-bkash' ) );
+                wc_add_notice( __( 'Transaction is failed.', 'wc-bkash' ), 'error' );
+                return;
+
+            case '1001':
+                wc_add_notice( __( 'Invalid MSISDN input. Try with correct mobile no.', 'wc-bkash' ), 'error' );
+                break;
+
+            case '1002':
+                wc_add_notice( __( 'Invalid transaction ID', 'wc-bkash' ), 'error' );
                 return;
 
             case '1003':
-                $woocommerce->add_error( __( 'Authorization Error, please contact site admin.', 'wc-bkash' ) );
+                wc_add_notice( __( 'Authorization Error, please contact site admin.', 'wc-bkash' ), 'error' );
                 return;
 
             case '1004':
-                $woocommerce->add_error( __( 'Transaction ID not found.', 'wc-bkash' ) );
+                wc_add_notice( __( 'Transaction ID not found.', 'wc-bkash' ), 'error' );
                 return;
 
             case '9999':
-                $woocommerce->add_error( __( 'System error, please contact site admin.', 'wc-bkash' ) );
+                wc_add_notice( __( 'System error, could not process request. Please contact site admin.', 'wc-bkash' ), 'error' );
                 return;
 
             case '0000':
@@ -178,7 +186,7 @@ class WC_Gateway_bKash extends WC_Payment_Gateway {
                 }
 
                 if ( $price > (float) $response->amount ) {
-                    $woocommerce->add_error( __( 'Transaction amount didn\'t match, are you cheating?', 'wc-bkash' ) );
+                    wc_add_notice( __( 'Transaction amount didn\'t match, are you cheating?', 'wc-bkash' ), 'error' );
                     return;
                 }
 
@@ -206,7 +214,7 @@ class WC_Gateway_bKash extends WC_Payment_Gateway {
         global $woocommerce;
 
         if ( empty( $_POST['bkash_trxid'] ) ) {
-            $woocommerce->add_error( __( 'Please type the transaction ID.', 'wc-bkash' ) );
+            wc_add_notice( __( 'Please type the transaction ID.', 'wc-bkash' ), 'error' );
             return;
         }
 
