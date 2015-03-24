@@ -32,8 +32,13 @@ Nothing here yet
 
 1. Gateway Settings
 2. Checkout page
+3. Order received page
+4. Order details page (pending order)
 
 == Changelog ==
+
+= 1.0 =
+* Moved the transaction ID form to order received page and order details page.
 
 = 0.1 =
 * First release

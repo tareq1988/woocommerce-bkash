@@ -3,7 +3,7 @@
 Plugin Name: bKash for WooCommerce
 Plugin URI: http://wedevs.com
 Description: bKash payment gateway integration for WooCommerce
-Version: 0.1
+Version: 1.0
 Author: Tareq Hasan
 Author URI: http://tareq.wedevs.com
 */
@@ -93,7 +93,6 @@ class WeDevs_bKash {
 
         $version = get_option( $this->version_key, '0.1' );
 
-        // do the upgrade routines
         if ( version_compare( $this->db_version, $version, '<=' ) ) {
             return;
         }
