@@ -18,7 +18,8 @@ if ( !defined( 'ABSPATH' ) ) exit;
  */
 class WeDevs_bKash {
 
-    private $db_version = '0.2';
+    private $db_version = '1.0';
+    private $version_key = '_bkash_version';
 
     /**
      * Kick off the plugin
@@ -67,7 +68,7 @@ class WeDevs_bKash {
 
         $query = "CREATE TABLE IF NOT EXISTS `{$wpdb->prefix}wc_bkash` (
             `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-            `trxId` bigint(20) DEFAULT NULL,
+            `trxId` int(11) DEFAULT NULL,
             `sender` varchar(15) DEFAULT NULL,
             `ref` varchar(100) DEFAULT NULL,
             `amount` varchar(10) DEFAULT NULL,
@@ -77,7 +78,32 @@ class WeDevs_bKash {
 
         $wpdb->query( $query );
 
-        update_option( '_bkash_version', $this->db_version );
+        $this->plugin_upgrades();
+
+        update_option( $this->version_key, $this->db_version );
+    }
+
+    /**
+     * Do plugin upgrade tasks
+     *
+     * @return void
+     */
+    private function plugin_upgrades() {
+        global $wpdb;
+
+        $version = get_option( $this->version_key, '0.1' );
+
+        // do the upgrade routines
+        if ( version_compare( $this->db_version, $version, '<=' ) ) {
+            return;
+        }
+
+        switch ( $version ) {
+            case '0.1':
+                $sql = "ALTER TABLE `{$wpdb->prefix}wc_bkash` CHANGE `trxId` `trxId` BIGINT(20) NULL DEFAULT NULL;";
+                $wpdb->query( $sql );
+                break;
+        }
     }
 }
 
