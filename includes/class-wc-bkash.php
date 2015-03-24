@@ -1,72 +1,24 @@
 <?php
 
 /**
- * bKash Payment gateway
- *
- * @author Tareq Hasan
+ * bKash Class
  */
-class WC_Gateway_bKash extends WC_Payment_Gateway {
+class WC_bKash {
 
     const base_url = 'http://www.bkashcluster.com:9080/dreamwave/merchant/trxcheck/sendmsg';
     private $table = 'wc_bkash';
 
-    /**
-     * Initialize the gateway
-     */
     function __construct() {
-        $this->id                 = 'bKash';
-        $this->icon               = false;
-        $this->has_fields         = true;
-        $this->method_title       = __( 'bKash', 'wc-bkash' );
-        $this->method_description = __( 'Pay via bKash payment', 'wc-bkash' );
-        $this->icon               = apply_filters( 'woo_bkash_logo', plugins_url( 'images/bkash-logo.png', dirname( __FILE__ ) ) );
+        add_action( 'wp_ajax_wc-bkash-confirm-trx', array($this, 'process_form') );
 
-        $title                    = $this->get_option( 'title' );
-        $this->title              = empty( $title ) ? __( 'bKash', 'wc-bkash' ) : $title;
-
-        $this->init_form_fields();
-        $this->init_settings();
-
-        add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array($this, 'process_admin_options') );
+        add_action( 'woocommerce_order_details_after_order_table', array($this, 'transaction_form_order_view') );
     }
 
-    /**
-     * Admin configuration parameters
-     *
-     * @return void
-     */
-    public function init_form_fields() {
-        $this->form_fields = array(
-            'enabled' => array(
-                'title'   => __( 'Enable/Disable', 'wc-bkash' ),
-                'type'    => 'checkbox',
-                'label'   => __( 'Enable bKash', 'wc-bkash' ),
-                'default' => 'yes'
-            ),
-            'title' => array(
-                'title'   => __( 'Title', 'wc-bkash' ),
-                'type'    => 'text',
-                'default' => __( 'bKash Payment', 'wc-bkash' ),
-            ),
-            'description' => array(
-                'title'   => __( 'Customer Message', 'wc-bkash' ),
-                'type'    => 'textarea',
-                'default' => 'Enter your payment transaction ID'
-            ),
-            'username' => array(
-                'title' => __( 'Merchant Username', 'wc-bkash' ),
-                'type'  => 'text',
-            ),
-            'pass' => array(
-                'title' => __( 'Merchant password', 'wc-bkash' ),
-                'type'  => 'text',
-            ),
-            'mobile' => array(
-                'title'       => __( 'Merchant mobile no.', 'wc-bkash' ),
-                'type'        => 'text',
-                'description' => __( 'Enter your registered merchant mobile number.', 'wc-bkash' ),
-            ),
-        );
+    function transaction_form_order_view( $order ) {
+
+        if ( $order->has_status( 'on-hold' ) && $order->payment_method == 'bKash' && is_view_order_page() ) {
+            self::tranasaction_form( $order->id );
+        }
     }
 
     /**
@@ -74,16 +26,135 @@ class WC_Gateway_bKash extends WC_Payment_Gateway {
      *
      * @return void
      */
-    public function payment_fields() {
+    public static function tranasaction_form( $order_id ) {
+        $option = get_option( 'woocommerce_bKash_settings', array() );
         ?>
-        <p class="form-row validate-required">
-            <label><?php _e( 'Transaction ID', 'wc-bkash' ) ?> <span class="required">*</span></label>
 
-            <input class="input-text" type="text" name="bkash_trxid" />
-            <span class="description"><?php echo $this->get_option('description'); ?></span>
-        </p>
+        <div class="wc-bkash-form-wrap" style="background: #eee;padding: 15px;border: 1px solid #ddd; margin: 15px 0;">
+            <div id="wc-bkash-result"></div>
+            <form action="" method="post" id="wc-bkash-confirm" class="wc-bkash-form">
+                <p class="form-row validate-required">
+                    <label><?php _e( 'Transaction ID', 'wc-bkash' ) ?>: <span class="required">*</span></label>
+
+                    <input class="input-text" type="text" name="bkash_trxid" required />
+                    <span class="description"><?php echo isset( $option['trans_help'] ) ? $option['trans_help'] : ''; ?></span>
+                </p>
+
+                <p class="form-row">
+                    <?php wp_nonce_field( 'wc-bkash-confirm-trx' ); ?>
+                    <input type="hidden" name="action" value="wc-bkash-confirm-trx">
+                    <input type="hidden" name="order_id" value="<?php echo $order_id; ?>">
+
+                    <?php $pay_order_button_text = apply_filters( 'wc_bkash_pay_order_button_text', __( 'Confirm Payment', 'wc-bkash' ) ); ?>
+                    <input type="submit" class="button alt" id="wc-bkash-submit" value="<?php echo esc_attr( $pay_order_button_text ); ?>" />
+                </p>
+            </form>
+        </div>
+
+        <script type="text/javascript">
+            jQuery(function($) {
+                $('form#wc-bkash-confirm').on('submit', function(event) {
+                    event.preventDefault();
+
+                    var submit = $(this).find('input[type=submit]');
+                    submit.attr('disabled', 'disabled');
+
+                    $.post('<?php echo admin_url( 'admin-ajax.php'); ?>', $(this).serialize(), function(data, textStatus, xhr) {
+                        submit.removeAttr('disabled');
+
+                        if ( data.success ) {
+                            window.location.href = data.data;
+                        } else {
+                            $('#wc-bkash-result').html('<ul class="woocommerce-error"><li>' + data.data + '</li></ul>');
+                        }
+                    });
+                });
+            });
+        </script>
         <?php
+    }
 
+    public function process_form() {
+        if ( ! wp_verify_nonce( $_POST['_wpnonce'], 'wc-bkash-confirm-trx' ) ) {
+            wp_send_json_error( __( 'Are you cheating?', 'wc-bkash' ) );
+        }
+
+        $order_id       = isset( $_POST['order_id'] ) ? intval( $_POST['order_id'] ) : 0;
+        $transaction_id = sanitize_key( $_POST['bkash_trxid'] );
+
+        $order          = wc_get_order( $order_id );
+        $response       = $this->do_request( $transaction_id );
+
+        if ( ! $response ) {
+            wp_send_json_error( __( 'Something went wrong submitting the request', 'wc-bkash' ) );
+            return;
+        }
+
+        if ( $this->transaction_exists( $response->trxId ) ) {
+            wp_send_json_error( __('This transaction has already been used!', 'wc-bkash' ) );
+            return;
+        }
+
+        switch ($response->trxStatus) {
+
+            case '0010':
+            case '0011':
+                wp_send_json_error( __( 'Transaction is pending, please try again later', 'wc-bkash' ) );
+                return;
+
+            case '0100':
+                wp_send_json_error( __( 'Transaction ID is valid but transaction has been reversed. ', 'wc-bkash' ) );
+                return;
+
+            case '0111':
+                wp_send_json_error( __( 'Transaction is failed.', 'wc-bkash' ) );
+                return;
+
+            case '1001':
+                wp_send_json_error( __( 'Invalid MSISDN input. Try with correct mobile no.', 'wc-bkash' ) );
+                break;
+
+            case '1002':
+                wp_send_json_error( __( 'Invalid transaction ID', 'wc-bkash' ) );
+                return;
+
+            case '1003':
+                wp_send_json_error( __( 'Authorization Error, please contact site admin.', 'wc-bkash' ) );
+                return;
+
+            case '1004':
+                wp_send_json_error( __( 'Transaction ID not found.', 'wc-bkash' ) );
+                return;
+
+            case '9999':
+                wp_send_json_error( __( 'System error, could not process request. Please contact site admin.', 'wc-bkash' ) );
+                return;
+
+            case '0000':
+                $price = (float) $order->get_total();
+
+                // check for BDT if exists
+                $bdt_price = get_post_meta( $order->id, '_bdt', true );
+                if ( $bdt_price != '' ) {
+                    $price = $bdt_price;
+                }
+
+                if ( $price > (float) $response->amount ) {
+                    wp_send_json_error( __( 'Transaction amount didn\'t match, are you cheating?', 'wc-bkash' ) );
+                    return;
+                }
+
+                $this->insert_transaction( $response );
+
+                $order->add_order_note( sprintf( __( 'bKash payment completed with TrxID#%s! bKash amount: %s', 'wc-bkash' ), $response->trxId, $response->amount ) );
+                $order->payment_complete();
+
+                wp_send_json_success( $order->get_view_order_url() );
+
+                break;
+        }
+
+        wp_send_json_error();
     }
 
     /**
@@ -98,127 +169,24 @@ class WC_Gateway_bKash extends WC_Payment_Gateway {
      */
     function do_request( $transaction_id ) {
 
+        $option = get_option( 'woocommerce_bKash_settings', array() );
         $query = array(
-            'user'   => $this->get_option( 'username' ),
-            'pass'   => $this->get_option( 'pass' ),
-            'msisdn' => $this->get_option( 'mobile' ),
+            'user'   => isset( $option['username'] ) ? $option['username'] : '',
+            'pass'   => isset( $option['pass'] ) ? $option['pass'] : '',
+            'msisdn' => isset( $option['mobile'] ) ? $option['mobile'] : '',
             'trxid'  => $transaction_id
         );
 
-        $url = self::base_url . '?' . http_build_query( $query, '', '&' );
+        $url      = self::base_url . '?' . http_build_query( $query, '', '&' );
         $response = file_get_contents( $url );
 
         if ( false !== $response ) {
             $response = json_decode( $response );
+
             return $response->transaction;
         }
 
         return false;
-    }
-
-    /**
-     * Process the gateway integration
-     *
-     * @param  int  $order_id
-     *
-     * @return void
-     */
-    public function process_payment( $order_id ) {
-        global $woocommerce;
-
-        $order = new WC_Order( $order_id );
-
-        $transaction_id = sanitize_key( $_POST['bkash_trxid'] );
-        $response = $this->do_request( $transaction_id );
-
-        if ( ! $response ) {
-            wc_add_notice( __( 'Something went wrong submitting the request', 'wc-bkash' ), 'error' );
-            return;
-        }
-
-        if ( $this->transaction_exists( $response->trxId ) ) {
-            wc_add_notice( __('Transaction already been used!', 'wc-bkash' ), 'error' );
-            return;
-        }
-
-        switch ($response->trxStatus) {
-
-            case '0010':
-            case '0011':
-                wc_add_notice( __( 'Transaction is pending, please try again later', 'wc-bkash' ), 'error' );
-                return;
-
-            case '0100':
-                wc_add_notice( __( 'Transaction ID is valid but transaction has been reversed. ', 'wc-bkash' ), 'error' );
-                return;
-
-            case '0111':
-                wc_add_notice( __( 'Transaction is failed.', 'wc-bkash' ), 'error' );
-                return;
-
-            case '1001':
-                wc_add_notice( __( 'Invalid MSISDN input. Try with correct mobile no.', 'wc-bkash' ), 'error' );
-                break;
-
-            case '1002':
-                wc_add_notice( __( 'Invalid transaction ID', 'wc-bkash' ), 'error' );
-                return;
-
-            case '1003':
-                wc_add_notice( __( 'Authorization Error, please contact site admin.', 'wc-bkash' ), 'error' );
-                return;
-
-            case '1004':
-                wc_add_notice( __( 'Transaction ID not found.', 'wc-bkash' ), 'error' );
-                return;
-
-            case '9999':
-                wc_add_notice( __( 'System error, could not process request. Please contact site admin.', 'wc-bkash' ), 'error' );
-                return;
-
-            case '0000':
-                $price = (float) $order->get_total();
-
-                // check for BDT if exists
-                $bdt_price = get_post_meta( $order->id, '_bdt', true );
-                if ( $bdt_price != '' ) {
-                    $price = $bdt_price;
-                }
-
-                if ( $price > (float) $response->amount ) {
-                    wc_add_notice( __( 'Transaction amount didn\'t match, are you cheating?', 'wc-bkash' ), 'error' );
-                    return;
-                }
-
-                $this->insert_transaction( $response );
-
-                $order->add_order_note( sprintf( __( 'bKash payment completed with TrxID#%s! bKash amount: %s', 'wc-bkash' ), $response->trxId, $response->amount ) );
-                $order->payment_complete();
-                $order->update_status( 'completed' );
-
-                return array(
-                    'result' => 'success',
-                    'redirect' => $this->get_return_url( $order )
-                );
-
-                break;
-        }
-    }
-
-    /**
-     * Validate place order submission
-     *
-     * @return bool
-     */
-    public function validate_fields() {
-        global $woocommerce;
-
-        if ( empty( $_POST['bkash_trxid'] ) ) {
-            wc_add_notice( __( 'Please type the transaction ID.', 'wc-bkash' ), 'error' );
-            return;
-        }
-
-        return true;
     }
 
     /**
@@ -254,12 +222,15 @@ class WC_Gateway_bKash extends WC_Payment_Gateway {
     function transaction_exists( $transaction_id ) {
         global $wpdb;
 
-        $result = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}{$this->table} WHERE trxId = %d", $transaction_id ) );
+        $query  = $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}{$this->table} WHERE trxId = %d", $transaction_id );
+        $result = $wpdb->get_row( $query );
+
         if ( $result ) {
             return true;
         }
 
         return false;
     }
-
 }
+
+new WC_bKash();

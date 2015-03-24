@@ -16,7 +16,9 @@ if ( !defined( 'ABSPATH' ) ) exit;
  *
  * @author Tareq Hasan
  */
-class WC_bKash {
+class WeDevs_bKash {
+
+    private $db_version = '0.2';
 
     /**
      * Kick off the plugin
@@ -39,8 +41,7 @@ class WC_bKash {
         }
 
         require_once dirname( __FILE__ ) . '/includes/class-wc-bkash.php';
-
-        new WC_Gateway_bKash();
+        require_once dirname( __FILE__ ) . '/includes/class-wc-gateway-bkash.php';
     }
 
     /**
@@ -66,7 +67,7 @@ class WC_bKash {
 
         $query = "CREATE TABLE IF NOT EXISTS `{$wpdb->prefix}wc_bkash` (
             `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-            `trxId` int(11) DEFAULT NULL,
+            `trxId` bigint(20) DEFAULT NULL,
             `sender` varchar(15) DEFAULT NULL,
             `ref` varchar(100) DEFAULT NULL,
             `amount` varchar(10) DEFAULT NULL,
@@ -75,8 +76,9 @@ class WC_bKash {
           ) ENGINE=InnoDB DEFAULT CHARSET=utf8;";
 
         $wpdb->query( $query );
-    }
 
+        update_option( '_bkash_version', $this->db_version );
+    }
 }
 
-new WC_bKash();
+new WeDevs_bKash();
