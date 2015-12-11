@@ -2,23 +2,23 @@
 
 bKash Payment Gateway for WooCommerce
 
-This is a very good and excellent plugin to shop online around Bangladesh using bKash payment gateway. If you(Store owner)'re using [WooCommerce](http://www.woothemes.com/woocommerce/) for your store, you definitely choose bKash for local payment for your shop. 
+This is a very good and excellent plugin to shop online around Bangladesh using bKash payment gateway. If you(Store owner)'re using [WooCommerce](http://www.woothemes.com/woocommerce/) for your store, you should choose bKash for local payment for your shop. 
 
 ### Here is how to use:  
 
-* Download the plugin from [WordPress.org](https://wordpress.org/plugins/woocommerce-bkash/)
+* Download the plugin from [WordPress.org](https://wordpress.org/plugins/woocommerce-bkash/). Typically, you're developer will do it for you, if you're not a developer yourself.
 
 * Install and active it, as you're normally install and active other plugin too,
 
-* Normally, you would not find any settings or options to use, rather go to <strong>WooCommerce</strong> > <strong>Settings</strong> from your <strong>Dashboard</strong>, location URL would be exactly like below - 
+* Normally, you would not find any settings or options to use in the Dashboard, rather go to <strong>WooCommerce</strong> > <strong>Settings</strong> from your <strong>Dashboard</strong>, location URL would be exactly like below - 
 
 ```
 http://yoursite.ext/wp-admin/admin.php?page=wc-settings
 ```
 
-* Now click on <strong>Checkout</strong> tab and you'll now see the <strong>bKash</strong> link, Click and enter the bKash setting page. 
+* Now click on <strong>Checkout</strong> tab and you'll now see the <strong>bKash</strong> link, Click and enter the bKash setting page, 
 
-* Now, do <strong>Check</strong> the checkbox, if the <strong>Enable/Disable</strong> option is unchecked,
+* Now, do <strong>Check</strong> the checkbox, if the <strong>Enable/Disable</strong> option is unchecked, This option must be checked to show this payment method in checkout page.
 
 * Give a custom <strong>Title</strong> text by yourself or keep it as is in the text field,
 
@@ -42,7 +42,7 @@ http://yoursite.ext/wp-admin/admin.php?page=wc-settings
 >8. You'll be getting a confirmation message in a while
 >9. That's it! :) 
 
-* Write a custom <strong>Transaction Help Text</strong> or keep it as is,
+* Write a custom <strong>Transaction Help Text</strong> or keep it as is. It'll be showing above the transaction confirmation box!
 
 * Now you are in the main point - 
 
@@ -50,6 +50,4 @@ Its time to take your bKash <strong>Merchant API Access</strong> Username and Pa
 
 * If everything sounds good, you're ready to sale your product using bKash! :) 
 
-This <strong>README.md </strong> file written by 
-
-##[Ariful Islam Shaon](https://github.com/aishaon) 
+This <strong>README.md</strong> file written by [<strong>Ariful Islam Shaon</strong>](https://github.com/aishaon) 
