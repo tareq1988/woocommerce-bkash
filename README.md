@@ -26,21 +26,21 @@ http://yoursite.ext/wp-admin/admin.php?page=wc-settings
 
 * Write an <strong>Instructions</strong> on how do your customer pay you using their bKash account. It'll be showing in front of them when they select <strong>bKash Payment</strong> option and did complete their <strong>Checkout</strong> process. 
 
-> Generally the message would be - 
->
+### Generally the message would be - 
+
 >Send your payment directly to 01*** *** ***(Your merchant number here) via bKash. Please use your Order ID as the payment reference. Your order won't be shipped until the fund have cleared in our account.
 >
 >#### How to send payment:
 
->- Dial *247#
->- Select or Press 3 for "Payment" option
->- Enter our bKash wallet number 01*** *** ***(Your merchant number here)
->- Enter amount of fee that you ordered already
->- Enter a reference, use your Order ID as reference
->- Enter 1 as counter number
->- Enter your bKash menu PIN to confirm payment
->- You'll be getting a confirmation message in a while
->- That's it! :) 
+>1. Dial *247#
+>2. Select or Press 3 for "Payment" option
+>3. Enter our bKash wallet number 01*** *** ***(Your merchant number here)
+>4. Enter amount of fee that you ordered already
+>5. Enter a reference, use your Order ID as reference
+>6. Enter 1 as counter number
+>7 Enter your bKash menu PIN to confirm payment
+>8. You'll be getting a confirmation message in a while
+>9. That's it! :) 
 
 * Write a custom <strong>Transaction Help Text</strong> or keep it as is,
 
@@ -50,4 +50,6 @@ Its time to take your bKash <strong>Merchant API Access</strong> Username and Pa
 
 * If everything sounds good, you're ready to sale your product using bKash! :) 
 
-This README.md file written by [Ariful Islam Shaon](https://github.com/aishaon) 
+This <strong>README.md </strong> file written by 
+
+##[Ariful Islam Shaon](https://github.com/aishaon) 
