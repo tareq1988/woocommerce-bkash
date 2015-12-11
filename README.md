@@ -1,4 +1,5 @@
-# woocommerce-bkash
+# WooCommerce bKash
+
 bKash Payment Gateway for WooCommerce
 
 
