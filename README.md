@@ -49,5 +49,3 @@ http://yoursite.ext/wp-admin/admin.php?page=wc-settings
 Its time to take your bKash <strong>Merchant API Access</strong> Username and Password from your <strong>[bKash Account Manager](http://www.bkash.com/support/contact-us)</strong>. You should now call them and take the info right around. When you're getting the desired access info, now enter the Username into <strong>Merchant Username</strong> filed and Password into <strong>Merchant Password</strong> field in the bKash settings page. And don't forget to enter the <strong>Merchant mobile number</strong> into the last field. Otherwise your this plugin doesn't work! 
 
 * If everything sounds good, you're ready to sale your product using bKash! :) 
-
-This <strong>README.md</strong> file written by [<strong>Ariful Islam Shaon</strong>](https://github.com/aishaon) 
