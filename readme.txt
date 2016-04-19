@@ -12,10 +12,6 @@ bKash Payment gateway for WooCommerce
 
 == Description ==
 
-bKash Payment gateway for WooCommerce.
-
-bKash Payment Gateway for WooCommerce
-
 This is a very good and excellent plugin to shop online around Bangladesh using bKash payment gateway. If you(Store owner)'re using [WooCommerce](http://www.woothemes.com/woocommerce/) for your store, you should choose bKash for local payment for your shop.
 
 = Using the Plugin =
