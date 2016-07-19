@@ -10,8 +10,8 @@ class WC_Gateway_bKash extends WC_Payment_Gateway {
     /**
      * Initialize the gateway
      */
-    function __construct() {
-        $this->id                 = 'bKash';
+    public function __construct() {
+        $this->id                 = 'bkash';
         $this->icon               = false;
         $this->has_fields         = true;
         $this->method_title       = __( 'bKash', 'wc-bkash' );
