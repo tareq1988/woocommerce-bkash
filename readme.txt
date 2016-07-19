@@ -3,7 +3,7 @@ Contributors: tareq1988
 Donate link: http://tareq.wedevs.com/donate/
 Tags: bkash, gateway, woocommerce, bdt, bangladesh
 Requires at least: 3.6
-Tested up to: 4.5
+Tested up to: 4.5.3
 Stable tag: trunk
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -85,6 +85,10 @@ Nothing here yet
 4. Order details page (pending order)
 
 == Changelog ==
+
+= 1.1.0 (20 July, 2016) =
+
+ * [fix] WooCommerce 3.6 compatibility. Settings screen was broken.
 
 = 1.0 =
 * Moved the transaction ID form to order received page and order details page.
