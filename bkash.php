@@ -3,9 +3,9 @@
 Plugin Name: bKash for WooCommerce
 Plugin URI: http://wedevs.com
 Description: bKash payment gateway integration for WooCommerce
-Version: 1.0
+Version: 1.1.0
 Author: Tareq Hasan
-Author URI: http://tareq.wedevs.com
+Author URI: https://tareq.wedevs.com
 */
 
 // don't call the file directly
