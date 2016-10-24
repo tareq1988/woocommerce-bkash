@@ -6,9 +6,9 @@ This is a very good and excellent plugin to shop online around Bangladesh using 
 
 ### Here is how to use:  
 
-* Download the plugin from [WordPress.org](https://wordpress.org/plugins/woocommerce-bkash/). Typically, you're developer will do it for you, if you're not a developer yourself.
+* Download the plugin from [WordPress.org](https://wordpress.org/plugins/woocommerce-bkash/). Typically, your developer will do it for you, if you're not a developer yourself.
 
-* Install and active it, as you're normally install and active other plugin too,
+* Install and active it, as you normally install and active other plugin too,
 
 * Normally, you would not find any settings or options to use in the Dashboard, rather go to <strong>WooCommerce</strong> > <strong>Settings</strong> from your <strong>Dashboard</strong>, location URL would be exactly like below - 
 

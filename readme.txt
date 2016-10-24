@@ -16,7 +16,7 @@ This is a very good and excellent plugin to shop online around Bangladesh using 
 
 = Using the Plugin =
 
-* Download the plugin, Install and active it, as you're normally install and active other plugin too,
+* Download the plugin, Install and active it, as you normally install and active other plugin too,
 
 * Normally, you would not find any settings or options to use in the Dashboard, rather go to <strong>WooCommerce</strong> > <strong>Settings</strong> from your <strong>Dashboard</strong>, location URL would be exactly like below -
 
