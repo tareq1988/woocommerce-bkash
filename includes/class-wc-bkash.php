@@ -16,7 +16,7 @@ class WC_bKash {
 
     function transaction_form_order_view( $order ) {
 
-        if ( $order->has_status( 'on-hold' ) && $order->payment_method == 'bKash' && is_view_order_page() ) {
+        if ( $order->has_status( 'on-hold' ) && $order->payment_method == 'bkash' && ( is_view_order_page() || is_order_received_page() ) ) {
             self::tranasaction_form( $order->id );
         }
     }
